@@ -1,0 +1,9 @@
+temp/
+target/
+**/target/
+.idea/
+RemoteSystemsTempFiles/
+.classpath
+.project
+.settings/
+/.metadata/
