@@ -18,30 +18,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", basePackages = {
-		"com.spring.nifi.adminconsole.dao" })
-public class WmDbConfig {
+@EnableJpaRepositories(entityManagerFactoryRef = "tmEntityManagerFactory", transactionManagerRef = "tmTransactionManager", basePackages = {
+		"com.spring.nifi.adminconsole.tmdao" })
+public class TmDbConfig {
 
-	@Primary
-	@Bean(name = "dataSource")
-	@ConfigurationProperties(prefix = "spring.datasource")
+	@Bean(name = "tmDataSource")
+	@ConfigurationProperties(prefix = "spring.tmdatasource")
 	public DataSource dataSource() {
 		return DataSourceBuilder.create().build();
 	}
 
-	@Primary
-	@Bean(name = "entityManagerFactory")
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
-			@Qualifier("dataSource") DataSource dataSource) {
-		return builder.dataSource(dataSource).packages("com.spring.nifi.adminconsole.model").persistenceUnit("Ord")
+	@Bean(name = "tmEntityManagerFactory")
+	public LocalContainerEntityManagerFactoryBean tmEntityManagerFactory(EntityManagerFactoryBuilder builder,
+			@Qualifier("tmDataSource") DataSource dataSource) {
+		return builder.dataSource(dataSource).packages("com.spring.nifi.adminconsole.tm.model").persistenceUnit("SHPM_T")
 				.build();
 	}
 
-	@Primary
-	@Bean(name = "transactionManager")
+	@Bean(name = "tmTransactionManager")
 	public PlatformTransactionManager transactionManager(
-			@Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory) {
-		return new JpaTransactionManager(entityManagerFactory);
+			@Qualifier("tmEntityManagerFactory") EntityManagerFactory tmEntityManagerFactory) {
+		return new JpaTransactionManager(tmEntityManagerFactory);
 	}
 
 }
